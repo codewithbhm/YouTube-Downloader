@@ -326,12 +326,12 @@ export function SidebarMenuButton({
   children,
   ...props
 }: SidebarMenuButtonProps) {
-  const Comp = asChild ? React.Fragment : "button"
-  const childProps = asChild ? {} : props
+  if (asChild) {
+    return children
+  }
 
   return (
-    <Comp
-      {...childProps}
+    <button
       className={cn(
         "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
         isActive
@@ -340,9 +340,10 @@ export function SidebarMenuButton({
         className,
       )}
       title={tooltip}
+      {...props}
     >
       {children}
-    </Comp>
+    </button>
   )
 }
 

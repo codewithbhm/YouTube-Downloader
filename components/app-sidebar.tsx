@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
 import { Home, Settings, ListChecks } from "lucide-react"
+import Link from "next/link"
 
 export function AppSidebar() {
   return (
@@ -18,26 +19,35 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a href="#">
-                <Home className="mr-2 h-4 w-4" />
+              <Link
+                href="/"
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+              >
+                <Home className="h-4 w-4" />
                 <span>Home</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a href="#">
-                <ListChecks className="mr-2 h-4 w-4" />
+              <Link
+                href="/downloads"
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+              >
+                <ListChecks className="h-4 w-4" />
                 <span>Downloads</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a href="#">
-                <Settings className="mr-2 h-4 w-4" />
+              <Link
+                href="/settings"
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+              >
+                <Settings className="h-4 w-4" />
                 <span>Settings</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
