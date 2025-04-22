@@ -82,12 +82,14 @@ export async function POST(request: NextRequest) {
     // For now, we'll simulate a download
 
     // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Return a mock download URL
+    // Return a mock download URL with properly encoded filename
+    const safeFilename = encodeURIComponent(video.title.replace(/[^\w\s.-]/g, ""))
+
     return NextResponse.json({
       success: true,
-      downloadUrl: `/api/files/${videoId}.${format}`,
+      downloadUrl: `/api/files/${videoId}.${format}?title=${safeFilename}`,
       filename: `${video.title}.${format}`,
     })
   } catch (error) {

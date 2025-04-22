@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import type { VideoResult, DownloadFormat } from "@/lib/types"
-import { downloadVideo } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
 import Image from "next/image"
@@ -36,47 +35,84 @@ export function DownloadDialog({ video, open, onOpenChange }: DownloadDialogProp
     setProgress(0)
 
     try {
-      // Simulate progress updates
+      // First, call the API to start the download process
+      const response = await fetch("/api/download", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          videoId: video.id,
+          format,
+          quality,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      // Simulate download progress with smoother updates
+      let currentProgress = 0
       const progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          const newProgress = prev + Math.random() * 10
-          return newProgress >= 100 ? 100 : newProgress
-        })
-      }, 300)
+        currentProgress += Math.random() * 5
+        if (currentProgress >= 100) {
+          currentProgress = 100
+          clearInterval(progressInterval)
 
-      // Call the API to download the video
-      await downloadVideo({
-        videoId: video.id,
-        format,
-        quality,
-        onProgress: (p) => setProgress(p),
-      })
+          // Show success toast
+          toast({
+            title: "Download complete",
+            description: `${video.title} has been downloaded successfully.`,
+            variant: "success",
+          })
 
-      clearInterval(progressInterval)
-      setProgress(100)
+          // Create a temporary anchor to trigger the download
+          const a = document.createElement("a")
+          a.href = data.downloadUrl
+          a.download = data.filename || `${video.title}.${format}`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
 
-      toast({
-        title: "Download complete",
-        description: `${video.title} has been downloaded successfully.`,
-      })
-
-      // Close the dialog after a short delay
-      setTimeout(() => {
-        onOpenChange(false)
-        setIsDownloading(false)
-      }, 1000)
+          // Close the dialog after a short delay
+          setTimeout(() => {
+            onOpenChange(false)
+            setIsDownloading(false)
+            setProgress(0)
+          }, 1000)
+        }
+        setProgress(currentProgress)
+      }, 200)
     } catch (error) {
+      console.error("Download error:", error)
       toast({
         title: "Download failed",
         description: "There was an error downloading the video. Please try again.",
         variant: "destructive",
       })
       setIsDownloading(false)
+      setProgress(0)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(newOpen) => {
+        if (isDownloading && newOpen === false) {
+          // Prevent closing while downloading
+          toast({
+            title: "Download in progress",
+            description: "Please wait for the download to complete.",
+          })
+          return
+        }
+        onOpenChange(newOpen)
+      }}
+    >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Download Video</DialogTitle>

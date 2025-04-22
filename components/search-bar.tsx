@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { VideoResults } from "@/components/video-results"
 import { useToast } from "@/hooks/use-toast"
 import { motion } from "framer-motion"
-import { searchVideos } from "@/lib/api"
 import type { VideoResult } from "@/lib/types"
 
 export function SearchBar() {
@@ -33,9 +32,31 @@ export function SearchBar() {
     setIsLoading(true)
 
     try {
-      const data = await searchVideos(query)
+      // Make a real API call to our backend
+      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+
+      const data = await response.json()
       setResults(data)
+
+      // Show toast for search completion
+      if (data.length === 0) {
+        toast({
+          title: "No results found",
+          description: "Try a different search term",
+        })
+      } else {
+        toast({
+          title: "Search completed",
+          description: `Found ${data.length} results`,
+          variant: "success",
+        })
+      }
     } catch (error) {
+      console.error("Search error:", error)
       toast({
         title: "Error",
         description: "Failed to search videos. Please try again.",

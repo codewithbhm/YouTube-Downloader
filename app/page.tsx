@@ -13,8 +13,8 @@ export default function Home() {
             <h1 className="text-xl font-semibold">YouTube Downloader</h1>
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-6">
-          <div className="mx-auto max-w-5xl">
+        <main className="flex-1 p-4 md:p-6 flex items-center justify-center">
+          <div className="w-full max-w-5xl">
             <SearchBar />
           </div>
         </main>
